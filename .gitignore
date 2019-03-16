@@ -1,0 +1,22 @@
+# node工程相关
+node_modules
+yarn.lock
+yarn-error.log
+npm-debug.log
+package-lock.json
+
+# GIT相关
+# .gitignore
+
+# 其他目录
+.DS_Store
+*/.DS_Store
+.idea
+*/.idea
+.vscode
+*/.vscode
+__MACOSX
+
+#打包相关
+Preview
+ReadmePackage/vendor/toc/js/ztree_toc.min.js

@@ -1,0 +1,195 @@
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>{{title}}</title>
+	<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet"
+		type="text/css" />
+	<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet"
+		type="text/css" />
+	<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="toc/css/globalStyle.css" media="all" rel="stylesheet" type="text/css" />
+	<style>
+		pre {
+			counter-reset: line-numbering;
+			border: solid 1px #d9d9d9;
+			border-radius: 0;
+			background: #fff;
+			padding: 0;
+			line-height: 23px;
+			margin-bottom: 30px;
+			white-space: pre;
+			overflow-x: auto;
+			word-break: inherit;
+			word-wrap: inherit;
+		}
+
+		pre a::before {
+			content: counter(line-numbering);
+			counter-increment: line-numbering;
+			padding-right: 1em;
+			/* space after numbers */
+			width: 25px;
+			text-align: right;
+			opacity: 0.7;
+			display: inline-block;
+			color: #aaa;
+			background: #eee;
+			margin-right: 16px;
+			padding: 2px 10px;
+			font-size: 13px;
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
+		pre a:first-of-type::before {
+			padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+			padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+			padding: 10px;
+		}
+
+		.highlight {
+			background-color: #ffffcc
+		}
+
+		html,
+		body {
+			height: 100%;
+			width: 100%;
+			padding: 0;
+			margin: 0;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.container {
+			height: 100%;
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+			background: white;
+		}
+
+		.leftContainer {
+			display: flex;
+			flex: 1;
+			min-width: 230px;
+			max-width: 850px;
+			width: 0;
+			height: 100%;
+			background: white;
+			border-right: 1px dashed #AAAAAA;
+		}
+
+		.seperatorDiv {
+			height: 100%;
+			width: 5px;
+			cursor: col-resize;
+		}
+
+		.ztree {
+			flex: 1;
+			width: 100%;
+			overflow: scroll;
+			background: white;
+		}
+
+		.rightContainer {
+			display: flex;
+			flex: 3;
+			width: 0;
+			height: 100%;
+			background: white;
+		}
+
+		.markdown-body {
+			width: 100%;
+			overflow: scroll;
+			background: white;
+			padding: 30px;
+			padding-left: 50px;
+		}
+
+		@media screen and (max-width: 1000px) {
+			.leftContainer {
+				display: none;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="leftContainer">
+			<ul id="tree" class="ztree" style='width:100%'>
+			</ul>
+		</div>
+		<div class="seperatorDiv" id="seperatorDiv"></div>
+		<div id='readme' class="rightContainer">
+			<article class='markdown-body'>
+				{{{parse_markdown}}}
+			</article>
+		</div>
+	</div>
+</body>
+
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.min.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		var color = 'color: orange';
+		console.log('%c这儿不会打印丝毫日志', color);
+		
+		var conf = {
+			debug: false,
+			is_auto_number: false,
+			documment_selector: '.markdown-body',
+			ztreeStyle: {}
+		};
+		$('#tree').ztree_toc(conf);
+
+		var startX = 0;
+		var startY = 0;
+		var currentLeftDivWidth = 0;
+
+		$('#seperatorDiv').mousedown(function (event) {
+			if (event.button === 0) {
+				startX = event.clientX;
+				startY = event.clientY;
+				currentLeftDivWidth = $('.leftContainer').width();
+				$(document).bind('mousemove', mouseMove);
+				$(document).bind('mouseup', mouseUp);
+			}
+			return false;
+		});
+
+		function mouseMove(event) {
+			var endX = event.clientX;
+			var endY = event.clientY;
+			var offsetX = endX - startX;
+			var offsetY = endY - startY;
+
+			$('.leftContainer').css('flex', 'none');
+			$('.leftContainer').width(currentLeftDivWidth + offsetX);
+		}
+
+		function mouseUp(event) {
+			startX = 0;
+			startY = 0;
+			$(document).unbind('mousemove');
+			$(document).unbind('mouseup');
+		}
+	});
+</script>
