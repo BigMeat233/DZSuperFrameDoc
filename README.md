@@ -1,4 +1,4 @@
-# SuperFrame V1.0.7.X
+# [SuperFrame V1.0.7.X](http://og.gl/doc/Release_V1.0.7.0.tar.gz)
 # 目录
 > ### [0. 写在前面的话](#0)
 > ### [1. 设计架构](#1)
@@ -8,7 +8,7 @@
 
 > ### [3. API说明](#3)
 >> #### [3.1 Core.logCore](#3.1)
->>> ##### [3.1.1 Core.logCore.configure(insId, environment, cfg)](#3.1.1)
+>>> ##### [3.1.1 Core.logCore.configure(insId, processIndex, environment, cfg)](#3.1.1)
 >>> ##### [3.1.2 Core\[.logCore\].log/HandlerLogger.log/CustomLogger.log(type, funcName, content)](#3.1.2)
 >>> ##### [3.1.3 Core.logCore.addLogger(cfg)](#3.1.3)
 >>> ##### [3.1.4 Core.logCore.getLogger(loggerId)](#3.1.4)
@@ -107,17 +107,17 @@
 >>> ##### [3.11.11 Core.cluster.sendDataToMaster(data, callBack)](#3.11.11)
 
 >> #### [3.12 Core.appMain](#3.12)
->>> ##### [3.12.1 Core.appMain.processIndex](#3.12.1)
->>> ##### [3.12.2 Core.appMain.onMasterProcessDidInit(masterProcessIndex)](#3.12.2)
->>> ##### [3.12.3 Core.appMain.onMasterProcessWillReceiveMessage(worker, data)](#3.12.3)
->>> ##### [3.12.4 Core.appMain.onMasterProcessDidReceiveMessage(worker, data)](#3.12.4)
->>> ##### [3.12.5 Core.appMain.onMasterProcessDiscardMessage(worker, data)](#3.12.5)
->>> ##### [3.12.6 Core.appMain.onMasterProcessDidReceiveCustomMessage(worker, data)](#3.12.6)
->>> ##### [3.12.7 Core.appMain.onWorkerProcessDidInit(workerProcessIndex)](#3.12.7)
->>> ##### [3.12.8 Core.appMain.onWorkerProcessWillReceiveMessage(data)](#3.12.8)
->>> ##### [3.12.9 Core.appMain.onWorkerProcessDidReceiveMessage(data)](#3.12.9)
->>> ##### [3.12.10 Core.appMain.onWorkerProcessDiscardMessage(data)](#3.12.10)
->>> ##### [3.12.11 Core.appMain.onWorkerProcessDidReceiveCustomMessage(data)](#3.12.11)
+>>> ##### [3.12.1 AppMain.processIndex](#3.12.1)
+>>> ##### [3.12.2 AppMain.onMasterProcessDidInit(masterProcessIndex)](#3.12.2)
+>>> ##### [3.12.3 AppMain.onMasterProcessWillReceiveMessage(worker, data)](#3.12.3)
+>>> ##### [3.12.4 AppMain.onMasterProcessDidReceiveMessage(worker, data)](#3.12.4)
+>>> ##### [3.12.5 AppMain.onMasterProcessDiscardMessage(worker, data)](#3.12.5)
+>>> ##### [3.12.6 AppMain.onMasterProcessDidReceiveCustomMessage(worker, data)](#3.12.6)
+>>> ##### [3.12.7 AppMain.onWorkerProcessDidInit(workerProcessIndex)](#3.12.7)
+>>> ##### [3.12.8 AppMain.onWorkerProcessWillReceiveMessage(data)](#3.12.8)
+>>> ##### [3.12.9 AppMain.onWorkerProcessDidReceiveMessage(data)](#3.12.9)
+>>> ##### [3.12.10 AppMain.onWorkerProcessDiscardMessage(data)](#3.12.10)
+>>> ##### [3.12.11 AppMain.onWorkerProcessDidReceiveCustomMessage(data)](#3.12.11)
 
 >> #### [3.13 Core.checker](#3.13)
 >>> ##### [3.13.1 Core.checker.check(limit, value, callBack)](#3.13.1)
@@ -371,16 +371,18 @@ var Core = require('Core.js');
 > X. ```Core.log()```为```Core.logCore.log()```的简略形式。  
 
 <a id="3.1.1"></a>
-#### 3.1.1 Core.logCore.configure(insId, environment, cfg)
+#### 3.1.1 Core.logCore.configure(insId, processIndex, environment, cfg)
 > **API说明:**  
 > 使用```configure()```传入当前运行实例的ID、环境和配置项对LogCore进行配置，配置后LogCore方可按照预期功能工作。
 
 > **参数列表:**  
 > **1. insId\<Integer\>**  
-当前运行实例的ID，**必传项**，为**整型数字**。会显示在输出的日志中，在生产环境下，实例ID是日志归档路径的一部分。  
-> **2. environment\<String\>**   
-> 当前运行实例的环境，**必传项**，为**特定字符串**，可选值为**['dev','prod']**。dev环境下日志将会直接输出到控制台；prod环境下如果配置正确且有效，业务处理日志将会按照**[源路径/实例ID/请求路径/请求方式/请求时刻.log]**归档；核心日志将会按照**[源路径/实例ID/核心ID/日期.log]**归档。  
-> **3. cfg\<Object\>**  
+> 当前运行实例的ID，**必传项**，为**整型数字**。会显示在输出的日志中，在生产环境下，实例ID是日志归档路径的一部分。  
+> **2. processIndex\<Integer/String\>**  
+> 当前运行进程的索引，**必传项**，为**整型数字/字符串**。会显示在输出的日志中，在生产环境下，进程索引是日志归档路径的一部分。  
+> **3. environment\<String\>**   
+> 当前运行实例的环境，**必传项**，为**特定字符串**，可选值为**['dev','prod']**。dev环境下日志将会直接输出到控制台；prod环境下如果配置正确且有效，业务处理日志将会按照**[源路径/实例ID/进程索引/请求路径/请求方式/请求时刻.log]**归档；核心日志将会按照**[源路径/实例ID/进程索引/核心ID/日期.log]**归档。 
+> **4. cfg\<Object\>**  
 > LogCore的配置项，**必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
 >> **state\<String\>：**全局的日志状态，**必传项**，为**特定字符串**，可选值为**['open','close']**。为close时不输出任何日志。  
@@ -412,6 +414,7 @@ Core.logCore.configure(insId, environment, logCoreCfg);
 > 1. ```LogCore.log()```是最基础的核心日志输出，在prod环境下的日志会归档到[源目录/Core]文件夹下。  
 > 2. ```HandlerLogger.log()```是业务处理日志输出，在prod环境下会按照请求的路径、类型等归档日志。  
 > 3. ```CustomLogger.log()```是自定义日志输出，在prod环境下日志会被归档至创建时配置项的位置。
+> <font color="red">4. 当进程异常退出时，Crash日志将会通过LogCore.log()进行记录。</font>
 
 > **参数列表:**  
 > **1. type\<String\>**  
@@ -507,7 +510,7 @@ customLogger.log('i', '自定义日志', '这是一条紫色的自定义日志')
 >> **state\<String\>：**实例状态，**必传项**，为**特定字符串**，可选值为**['open','close']**。当状态为close时，不执行实际构建操作。  
 >> **databaseName\<String\>：**数据库名，**必传项**，为**字符串**。  
 >> **databaseType\<String\>：**Mongodb实例类型，**必传项**，为**特定字符串**，可选值为**['normal','replica']**。当Mongodb为单机或shard集群时，使用normal，此时配置项中的group必填；为replica集群时使用replica，此时配置项中的replica必填。  
->> **group\<Array\<Object\>\>：**Mongodb服务器(组)，**```databaseType === 'normal'```时必传**，为**数组类型<对象类型>**，field格式为：**{选项名:选项细节}**。
+>> **group\<Array\<Object\>\>：**Mongodb服务器(组)，**```databaseType === 'normal'```时必传**，为**数组类型<对象类型>**，field格式为：**{选项名:选项细节}**。  
 >>> 可配置选项名有：  
 >>> **state\<String\>：**服务器的状态，**必传项**，为**特定字符串**，可选值为**['open','close']**。当状态为close时，不使用此服务器。  
 >>> **weight\<Integer\>：**负载均衡权重，**非必传项**，为**整型数字**，默认值为**1**。将会根据所有服务器的权重随机选择执行API的服务器。  
@@ -2008,7 +2011,7 @@ serverCore.common.saveFile(0, 'testImg.png', fs.readFileSync('/Users/Douzi/Downl
 > 4. Handler中推荐使用HandlerLogger进行日志收集，日志将按照每次请求被归档。  
 > 5. Handler中有默认的预处理、GET处理、POST处理，若不实现则进入默认处理流程。  
 > 6. Handler中调用底层API时推荐使用**[3.7 HandlerFuncs](#3.7)**做封装。  
-> 7. 每一小节的样例代码为Handler的默认处理流程。
+> 7. 每一小节的样例代码为Handler的默认处理流程。  
 
 <a id="3.6.1"></a>
 #### 3.6.1 Core.handler.constructor(routePath)
@@ -2899,7 +2902,6 @@ Core.macro.CORE_TYPE_NAME_MESSAGE]
 ```
 > **2. instance\<Object\>**  
 > 实例变量，**必传项**，为**对象类型**。
-
 > **3. idKeyName\<String\>**  
 > 标识实例的字段名，**非必传项**，为**字符串**，默认值为**'id'**。
 
@@ -3094,7 +3096,7 @@ Core.control.removeEvent('event_01');
 
 <a id="3.10"></a>
 ### 3.10 Core.safe
-**<font color="red">推荐在Master进程中对SafeCore进行配置和操作。</font>**
+**<font color="red">推荐在Master进程中（即[AppMain](#3.12)有关于Master进程的HOOK函数中）对SafeCore进行配置和操作。</font>**
 > **说明:**  
 > 0. SafeCore用于对包进行加签和验签，以保证发布时包的完整性。  
 > 1. ```Core.safe```为全局单例，在框架加载的时候进行自初始化。  
@@ -3206,7 +3208,7 @@ Core.safe.verify();
 <a id="3.11.1"></a>
 #### 3.11.1 Core.cluster.index
 > **API说明:**  
-> ```Core.cluster.index```**<font color="red">可在Master/Worker进程中使用</font>**，用来获取当前运行进程的进程索引。  
+> ```Core.cluster.index```**<font color="red">可在Master/Worker进程中使用</font>**，是一个属性，用来获取当前运行进程的进程索引。  
 
 
 > **结果说明:**  
@@ -3223,7 +3225,7 @@ console.log(Core.cluster.index);
 <a id="3.11.2"></a>
 #### 3.11.2 Core.cluster.getType()
 > **API说明:**  
-> ```Core.cluster.getType()```**<font color="red">可在Master/Worker进程中使用</font>**，用来获取当前运行进程的进程类型。  
+> ```getType()```**<font color="red">可在Master/Worker进程中使用</font>**，用来获取当前运行进程的进程类型。  
 
 > **结果说明:**  
 > **1. processType\<String\>**  
@@ -3239,7 +3241,7 @@ console.log(Core.cluster.getType());
 <a id="3.11.3"></a>
 #### 3.11.3 Core.cluster.initWithAppMain(appMain)
 > **API说明:**  
-> ```Core.cluster.initWithAppMain()```**<font color="red">可在Master/Worker进程中使用</font>**，用来指定程序入口并初始化ClusterCore。关于AppMain的详细说明见[3.12 Core.appMain](#3.12)  
+> ```initWithAppMain()```**<font color="red">可在Master/Worker进程中使用</font>**，用来指定程序入口并初始化ClusterCore。关于AppMain的详细说明见[3.12 Core.appMain](#3.12)  
 
 > **参数列表:**  
 > **1. appMain\<AppMain\>**  
@@ -3269,7 +3271,7 @@ Core.cluster.initWithAppMain(AppMain);
 <a id="3.11.4"></a>
 #### 3.11.4 Core.cluster.start()
 > **API说明:**  
-> ```Core.cluster.start()```**<font color="red">可在Master/Worker进程中使用</font>**，在Master进程中调用时，将会触发Master进程的初始化操作，Master进程初始化完成后将会调用[```Core.appMain.onMasterProcessDidInit()```](#3.12.2)；在Worker进程使用时，不执行任何操作。  
+> ```start()```**<font color="red">可在Master/Worker进程中使用</font>**，在Master进程中调用时，将会触发Master进程的初始化操作，Master进程初始化完成后将会调用[```Core.appMain.onMasterProcessDidInit()```](#3.12.2)；在Worker进程使用时，不执行任何操作。  
 
 > **样例代码:**  
 > 
@@ -3282,7 +3284,7 @@ Core.cluster.start();
 <a id="3.11.5"></a>
 #### 3.11.5 Core.cluster.shutdown()
 > **API说明:**  
-> ```Core.cluster.shutdown()```**<font color="red">可在Master/Worker进程中使用</font>**，用来退出整个进程（组）。  
+> ```shutdown()```**<font color="red">可在Master/Worker进程中使用</font>**，用来退出整个进程（组）。  
 
 > **样例代码:**  
 > 
@@ -3295,15 +3297,13 @@ Core.cluster.shutdown();
 <a id="3.11.6"></a>
 #### 3.11.6 Core.cluster.setGlobalObject(key, value, callBack)
 > **API说明:**  
-> ```Core.cluster.setGlobalObject()```**<font color="red">可在Master/Worker进程中使用</font>**，用来在全局（进程组）对象中设置一个field。  
+> ```setGlobalObject()```**<font color="red">可在Master/Worker进程中使用</font>**，用来在全局（进程组）对象中设置一个field。  
 
 > **参数列表:**  
 > **1. key\<String\>**  
 > 待设置值的ID，**必传项**，为**字符串**。获取全局对象时需要使用此ID。  
-
 > **2. value\<Object/Number/Boolean/String\>**  
-> 待设置值，**必传项**，为**对象类型/数字/波尔/字符串**。  
-
+> 待设置值，**必传项**，为**对象类型/数字/布尔/字符串**。  
 > **3. callBack\<Function\>**  
 > 调用回调，**必传项**，为**函数类型**。  
 >> 参数列表为：  
@@ -3328,12 +3328,11 @@ Core.cluster.setGlobalObject(key, value, (result, globalObject) => {
 <a id="3.11.7"></a>
 #### 3.11.7 Core.cluster.getGlobalObject([key], callBack)
 > **API说明:**  
-> ```Core.cluster.getGlobalObject()```**<font color="red">可在Master/Worker进程中使用</font>**，用来在全局（进程组）对象中获取一个field。  
+> ```getGlobalObject()```**<font color="red">可在Master/Worker进程中使用</font>**，用来在全局（进程组）对象中获取一个field。  
 
 > **参数列表:**  
 > **1. key\<String\>**  
 > 待获取值的ID，**非必传项**，为**字符串**。设置全局对象时使用的ID，若不传则为获取整个全局对象。  
-
 > **2. callBack\<Function\>**  
 > 调用回调，**必传项**，为**函数类型**。  
 >> 参数列表为：  
@@ -3354,7 +3353,7 @@ Core.cluster.getGlobalObject(key, (result, objectInfo) => {
 <a id="3.11.8"></a>
 #### 3.11.8 Core.cluster.workers
 > **API说明:**  
-> ```Core.cluster.workers```**<font color="red">仅可在Master进程中使用</font>**，用来获取进程组中所有的Worker进程。  
+> ```Core.cluster.workers```**<font color="red">仅可在Master进程中使用</font>**，是一个属性，用来获取进程组中所有的Worker进程。  
 
 
 > **结果说明:**  
@@ -3376,7 +3375,7 @@ console.log(Core.cluster.workers);
 <a id="3.11.9"></a>
 #### 3.11.9 Core.cluster.forkWithWorkerProcessNum(workerProcessNum)
 > **API说明:**  
-> ```Core.cluster.forkWithWorkerProcessNum()```**<font color="red">仅可在Master进程中使用</font>**，用来Fork指定数量的Worker进程，Worker进程初始化完成后将调用[```Core.appMain.onWorkerProcessDidInit()```](#3.12.7)。  
+> ```forkWithWorkerProcessNum()```**<font color="red">仅可在Master进程中使用</font>**，用来Fork指定数量的Worker进程，Worker进程初始化完成后将调用[```Core.appMain.onWorkerProcessDidInit()```](#3.12.7)。  
 
 > **参数列表:**  
 > **1. workerProcessNum\<Integer\>**  
@@ -3392,15 +3391,13 @@ Core.cluster.forkWithWorkerProcessNum(4);
 <a id="3.11.10"></a>
 #### 3.11.10 Core.cluster.sendDataToWorker(worker, data, callBack)
 > **API说明:**  
-> ```Core.cluster.sendDataToWorker()```**<font color="red">仅可在Master进程中使用</font>**，用来从Master进程向Worker进程发起IPC通讯。**<font color="red">推荐通过AppMain中的HOOK方法对IPC通信消息进行捕获并处理</font>**。  
+> ```sendDataToWorker()```**<font color="red">仅可在Master进程中使用</font>**，用来从Master进程向Worker进程发起IPC通讯。**<font color="red">推荐通过AppMain中的HOOK方法对IPC通信消息进行捕获并处理</font>**。  
 
 > **参数列表:**  
 > **1. worker\<Object\>**  
-IPC的目标Worker，**必传项**，为**对象类型**。可通过**[```Core.cluster.workers``` ](#3.11.8)**或**AppMain回调方法**获取。 
-
+IPC的目标Worker，**必传项**，为**对象类型**。可通过**[```Core.cluster.workers``` ](#3.11.8)**或**AppMain回调方法**获取。  
 > **2. data\<Object/Number/Boolean/String\>**  
 IPC传输的数据，**必传项**，为**对象/数字/布尔/字符串类型**。**<font color="red">推荐使用含有字段名为type的对象类型作为IPC通信消息，type格式为：[发起方]:[消息名]，例：```{ type: 'MASTER:CUSTOM_EVENT' }```</font>**。  
-
 > **3. callBack\<Function\>**  
 > 调用回调，**必传项**，为**函数类型**。  
 >> 参数列表为：  
@@ -3420,12 +3417,11 @@ Core.cluster.sendDataToWorker(worker, data, (result) => {
 <a id="3.11.11"></a>
 #### 3.11.11 Core.cluster.sendDataToMaster(data, callBack)
 > **API说明:**  
-> ```Core.cluster.sendDataToMaster()```**<font color="red">仅可在Worker进程中使用</font>**，用来从Worker进程向Master进程发起IPC通讯。**<font color="red">推荐通过AppMain中的HOOK方法对IPC通信消息进行捕获并处理</font>**。  
+> ```sendDataToMaster()```**<font color="red">仅可在Worker进程中使用</font>**，用来从Worker进程向Master进程发起IPC通讯。**<font color="red">推荐通过AppMain中的HOOK方法对IPC通信消息进行捕获并处理</font>**。  
 
 > **参数列表:**  
 > **1. data\<Object/Number/Boolean/String\>**  
 IPC传输的数据，**必传项**，为**对象/数字/布尔/字符串类型**。**<font color="red">推荐使用含有字段名为type的对象类型作为IPC通信消息，type格式为：[发起方]:[消息名]，例：```{ type: 'WORKER:CUSTOM_EVENT' }```</font>**。    
-
 > **2. callBack\<Function\>**  
 > 调用回调，**必传项**，为**函数类型**。  
 >> 参数列表为：  
@@ -3441,7 +3437,425 @@ Core.cluster.sendDataToMaster(data, (result) => {
 });
 ```
 
+<a id="3.12"></a>
+### 3.12 Core.appMain
+**<font color="red">在使用ClusterCore的情境下，应用程序执行后将会按照AppMain中指定的响应方式运行。</font>**
+> **说明:**  
+> 0. AppMain包含应用程序生命周期的HOOK函数，ClusterCore初始化时会实例化单例态的AppMain。  
+> 1. 实现AppMain时推荐使用继承的方式，对其中原有的生命周期HOOK函数进行复写。  
+> 2. AppMain中Master进程的HOOK函数中的代码将在Master进程运行。  
+> 3. AppMain中Worker进程的HOOK函数中的代码将在Worker进程运行。  
+> 3. AppMain中可以捕获到IPC通信的所有消息（包含ClusterCore和进程初始化必须进行的系统级别IPC）。  
+> 4. AppMain中有完整的IPC通信生命周期，**<font color="red">IPC通信的HOOK中不建议使用AppMain.processIndex</font>**。  
 
+```
+// ClusterCore与AppMain联动模型
+
+                                          +-----------------------+
+                                          |  // Master中执行       |
+                                          |  ClusterCore.start()  |
+                                          +-----------+-----------+
+                                                      |
+                                Master进程执行初始化操作 |
+                                                      |
+                                                      v
+                                +-------------------------------------------+
+                                |      // 初始化执行完成后将在Master回调        |
+                                |      AppMain.onMasterProcessDidInit()     |
+                                +---------------------+---------------------+
+                                                      |
+                                   当Master成功初始化&& |
+                           在Master执行Worker的Fork操作 |
+                                                      |
+                                                      v
+                                +-------------------------------------------+
+                                |      // 初始化执行完成后将在Worker回调        |
+                                |      AppMain.onWorkerProcessDidInit()     |
+                                +-------------------------------------------+
+                                
+// Master进程处理IPC通信模型
+
+                                           +---------------------+
+                                           | IPC Msg From Worker |
+                                           +----------+----------+
+                                                      |
+                                                      |
+                                                      |
+                                                      v
+                          +-------------------------------------------------------+
+                          |          // 此函数执行的结果将决定此次IPC是否被舍弃         |
+                          |          onMasterProcessWillReceiveMessage()          |
+                          +-------------+-------------+-------------+-------------+
+                                        |             |             |
+                           消息未被舍弃&& |             |             |
+                    消息Type非系统默认消息 |             |             |
+                                        |             |             |
+                                        v             |             |
+       +------------------------------------------+   |             |
+       | onMasterProcessDidReceiveCustomMessage() |   |             |
+       +--------------------+---------------------+   |             |
+                            |                         |             |
+            自定义消息处理完成 |            消息未被舍弃&& |             |
+                            |     消息Type为系统默认消息 |             |
+                            |                         |             |
+                            v                         v             |
+                      +------------------------------------+        |      
+                      | onMasterProcessDidReceiveMessage() |        |
+                      +------------------------------------+        |
+                                                                    |
+                                                                    |
+                                                         消息将被舍弃 |
+                                                                    |
+                                                                    v
+                                                    +---------------------------------+                
+                                                    | onMasterProcessDiscardMessage() |
+                                                    +---------------------------------+
+// Worker进程处理IPC通信模型
+
+
+                                           +---------------------+
+                                           | IPC Msg From Master |
+                                           +----------+----------+
+                                                      |
+                                                      |
+                                                      |
+                                                      v
+                          +-------------------------------------------------------+
+                          |          // 此函数执行的结果将决定此次IPC是否被舍弃         |
+                          |          onWorkerProcessWillReceiveMessage()          |
+                          +-------------+-------------+-------------+-------------+
+                                        |             |             |
+                           消息未被舍弃&& |             |             |
+                    消息Type非系统默认消息 |             |             |
+                                        |             |             |
+                                        v             |             |
+       +------------------------------------------+   |             |
+       | onWorkerProcessDidReceiveCustomMessage() |   |             |
+       +--------------------+---------------------+   |             |
+                            |                         |             |
+            自定义消息处理完成 |            消息未被舍弃&& |             |
+                            |     消息Type为系统默认消息 |             |
+                            |                         |             |
+                            v                         v             |
+                      +------------------------------------+        |      
+                      | onWorkerProcessDidReceiveMessage() |        |
+                      +------------------------------------+        |
+                                                                    |
+                                                                    |
+                                                         消息将被舍弃 |
+                                                                    |
+                                                                    v
+                                                    +---------------------------------+                
+                                                    | onWorkerProcessDiscardMessage() |
+                                                    +---------------------------------+
+                                                    
+```
+
+<a id="3.12.1"></a>
+#### 3.12.1 AppMain.processIndex
+> **API说明:**  
+> ```AppMain.processIndex```是一个属性，用来表示当前AppMain运行的进程索引。**<font color="red">此属性在进程初始化完成后由ClusterCore传入，而IPC是进程初始化的重要阶段，故不推荐在IPC通信的生命周期HOOK函数中使用</font>**。
+
+> **结果说明:**  
+> **1. processIndex\<String/Interger\>**  
+> 进程索引，为**字符串/整型数字**。当前运行进程为Master进程时，进程索引为**'M'**；当前运行进程为Worker时，进程索引为大于等于0的**整型数字**；当Worker进程尚未初始化时，进程索引为**'W:NULL'**。
+
+> **样例代码:**  
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  // Master进程初始化完成
+  onMasterProcessDidInit() {
+    console.log(this.processIndex);
+    Core.cluster.forkWithWorkerProcessNum(1);
+  }
+  // Worker进程初始化完成
+  onWorkerProcessDidInit() {
+    console.log(this.processIndex);
+  }
+}
+// 初始化ClusterCore 
+Core.cluster.initWithAppMain(AppMain);
+Core.cluster.start();
+```
+
+<a id="3.12.2"></a>
+#### 3.12.2 AppMain.onMasterProcessDidInit(masterProcessIndex)
+> **API说明:**  
+> ```onMasterProcessDidInit()```是Master进程初始化完成时将调用的HOOK函数，此后才可在```AppMain.processIndex```中可以获取到当前Master进程的索引。**<font color="red">此HOOK函数中的代码将会运行在Master进程，通常在此HOOK函数中执行[```Core.cluster.forkWithWorkerProcessNum()```](#3.11.9)</font>**。    
+
+> **参数说明:**  
+> **1. masterProcessIndex\<String\>**  
+> Master进程的索引，为**字符串**，通常情况下为**'M'**。  
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  // Master进程初始化完成
+  onMasterProcessDidInit(masterProcessIndex) {
+    console.log(masterProcessIndex);
+  }
+}
+```
+
+<a id="3.12.3"></a>
+#### 3.12.3 AppMain.onMasterProcessWillReceiveMessage(worker, data)
+> **API说明:**  
+> ```onMasterProcessWillReceiveMessage()```是Master进程收到来自Worker进程IPC通信消息时的HOOK函数，此函数为纯函数，不推荐进行异步操作，可以通过控制返回值决定IPC消息是否向下传递或被舍弃。**<font color="red">其中代码将会运行在Master进程，不推荐在此方法中调用[```AppMain.processIndex```](#3.12.1)</font>**。  
+
+> **流程说明:**  
+>> 1.当此函数返回null时，则认为此次IPC通信被舍弃，**原IPC通信数据（即参数说明中的data）**将会被传入[```AppMain.onMasterProcessDiscardMessage()```](#3.12.5)。  
+
+>> 2.当返回非null的值时，则认为此次IPC通信会被捕获。
+
+>>> 2.1 如果IPC消息类型不为系统预留类型，则**新IPC通信数据（即结果说明中的nextData）**将会被传入[```AppMain.onMasterProcessDidReceiveCustomMessage()```](#3.12.6)进行自定义IPC消息处理，执行完成后**新IPC通信数据（即结果说明中的nextData）**还会被传入[```AppMain.onMasterProcessDidReceiveMessage()```](#3.12.4)进行最后的IPC消息处理。  
+
+>>> 2.2 如果消息类型为系统预留类型，则会先进行系统默认的处理，结束后将**新IPC通信数据（即结果说明中的nextData）**传入[```AppMain.onMasterProcessDidReceiveMessage()```](#3.12.4)进行最后的IPC消息处理。  
+
+>> 3.会被认为是来自Worker的系统默认IPC通讯消息类型为
+>> 
+```
+[
+  Core.macro.CLUSTER_WORKER_IPC_TYPE_GET_WORKER_INDEX,
+  Core.macro.CLUSTER_WORKER_IPC_TYPE_SET_GLOBAL_OBJECT,
+  Core.macro.CLUSTER_WORKER_IPC_TYPE_GET_GLOBAL_OBJECT,
+  Core.macro.CLUSTER_WORKER_IPC_TYPE_SHUTDOWN
+]
+```
+
+> **参数说明:**  
+> **1. worker\<Object\>**  
+> IPC通信发起方的Worker进程，为**对象类型**。此对象可以直接传入[```Core.cluster.sendDataToWorker()```](#3.11.10)。  
+> **2. data\<Object/Number/Boolean/String\>**  
+> IPC通信从Worker发来的数据，为**对象类型/数字/布尔/字符串**。  
+
+> **结果说明:**  
+> **1. nextData\<Object/Number/Boolean/String/Null\>**  
+> IPC通信继续向下传递的数据，为**对象类型/数字/布尔/字符串/Null**。
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  onMasterProcessWillReceiveMessage(worker, data) {
+    if (data.type === 'WORKER:WILL_DISCARD_MSG') {
+      return null;
+    } else {
+      return data;
+    }
+  }
+}
+```
+
+<a id="3.12.4"></a>
+#### 3.12.4 AppMain.onMasterProcessDidReceiveMessage(worker, data)
+> **API说明:**  
+> ```onMasterProcessDidReceiveMessage()```是Master进程处理被捕获的IPC消息最后的HOOK函数，可以在其中进行异步操作。**<font color="red">其中代码将会运行在Master进程，不推荐在此方法中调用[```AppMain.processIndex```](#3.12.1)</font>**。  
+
+> **参数说明:**  
+> **1. worker\<Object\>**  
+> IPC通信发起方的Worker进程，为**对象类型**。此对象可以直接传入[```Core.cluster.sendDataToWorker()```](#3.11.10)。  
+> **2. data\<Object/Number/Boolean/String\>**  
+> IPC通信从Worker发来的数据，为**对象类型/数字/布尔/字符串**。<font color="red">此值为[```AppMain.onMasterProcessWillReceiveMessage()```](#3.12.3)的返回值</font>。  
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  onMasterProcessDidReceiveMessage(worker, data) {
+    console.log(`Master Did Receive: ${worker.index} -> ${JSON.stringify(data)}`);
+  }
+}
+```
+
+<a id="3.12.5"></a>
+#### 3.12.5 AppMain.onMasterProcessDiscardMessage(worker, data)
+> **API说明:**  
+> ```onMasterProcessDiscardMessage()```是Master进程处理被舍弃的IPC消息最后的HOOK函数，可以在其中进行异步操作。**<font color="red">其中代码将会运行在Master进程，不推荐在此方法中调用[```AppMain.processIndex```](#3.12.1)</font>**。  
+
+> **参数说明:**  
+> **1. worker\<Object\>**  
+> IPC通信发起方的Worker进程，为**对象类型**。此对象可以直接传入[```Core.cluster.sendDataToWorker()```](#3.11.10)。  
+> **2. data\<Object/Number/Boolean/String\>**  
+> IPC通信从Worker发来的数据，为**对象类型/数字/布尔/字符串**。<font color="red">此值为[```AppMain.onMasterProcessWillReceiveMessage()```](#3.12.3)传入的data</font>。  
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  onMasterProcessDiscardMessage(worker, data) {
+    console.log(`Master Discard: ${worker.index} -> ${JSON.stringify(data)}`);
+  }
+}
+```
+
+<a id="3.12.6"></a>
+#### 3.12.6 AppMain.onMasterProcessDidReceiveCustomMessage(worker, data)
+> **API说明:**  
+> ```onMasterProcessDidReceiveCustomMessage()```是Master进程处理被捕获的非系统默认IPC消息的HOOK函数，不推荐在其中进行异步操作。**<font color="red">其中代码将会运行在Master进程，不推荐在此方法中调用[```AppMain.processIndex```](#3.12.1)，此函数执行结束后将会调用[```AppMain.onMasterProcessDidReceiveMessage()```](#3.12.4)</font>**。  
+
+> **参数说明:**  
+> **1. worker\<Object\>**  
+> IPC通信发起方的Worker进程，为**对象类型**。此对象可以直接传入[```Core.cluster.sendDataToWorker()```](#3.11.10)。  
+> **2. data\<Object/Number/Boolean/String\>**  
+> IPC通信从Worker发来的数据，为**对象类型/数字/布尔/字符串**。<font color="red">此值为[```AppMain.onMasterProcessWillReceiveMessage()```](#3.12.3)的返回值</font>。  
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  onMasterProcessDidReceiveCustomMessage(worker, data) {
+    console.log(`Master Did Receive Custom: ${worker.index} -> ${JSON.stringify(data)}`);
+  }
+}
+```
+
+<a id="3.12.7"></a>
+#### 3.12.7 AppMain.onWorkerProcessDidInit(workerProcessIndex)
+> **API说明:**  
+> ```onWorkerProcessDidInit()```是Worker进程初始化完成时将调用的HOOK函数，此后才可在```AppMain.processIndex```中可以获取到当前Worker进程的索引。**<font color="red">此HOOK函数中的代码将会运行在Worker进程，通常在此HOOK函数中执行应用程序核心的初始化操作</font>**。    
+
+> **参数说明:**  
+> **1. workerProcessIndex\<Integer\>**  
+> Worker进程的索引，为**整型数字**。 
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  // Worker进程初始化完成
+  onWorkerProcessDidInit(workerProcessIndex) {
+    console.log(workerProcessIndex);
+  }
+}
+```
+
+<a id="3.12.8"></a>
+#### 3.12.8 AppMain.onWorkerProcessWillReceiveMessage(data)
+> **API说明:**  
+> ```onWorkerProcessWillReceiveMessage()```是Worker进程收到来自Master进程IPC通信消息时的HOOK函数，此函数为纯函数，不推荐进行异步操作，可以通过控制返回值决定IPC消息是否向下传递或被舍弃。**<font color="red">其中代码将会运行在Worker进程，不推荐在此方法中调用[```AppMain.processIndex```](#3.12.1)</font>**。  
+
+> **流程说明:**  
+>> 1.当此函数返回null时，则认为此次IPC通信被舍弃，**原IPC通信数据（即参数说明中的data）**将会被传入[```AppMain.onWorkerProcessDiscardMessage()```](#3.12.10)。  
+
+>> 2.当返回非null的值时，则认为此次IPC通信会被捕获。
+
+>>> 2.1 如果IPC消息类型不为系统预留类型，则**新IPC通信数据（即结果说明中的nextData）**将会被传入[```AppMain.onWorkerProcessDidReceiveCustomMessage()```](#3.12.11)进行自定义IPC消息处理，执行完成后**新IPC通信数据（即结果说明中的nextData）**还会被传入[```AppMain.onWorkerProcessDidReceiveMessage()```](#3.12.9)进行最后的IPC消息处理。  
+
+>>> 2.2 如果消息类型为系统预留类型，则会先进行系统默认的处理，结束后将**新IPC通信数据（即结果说明中的nextData）**传入[```AppMain.onWorkerProcessDidReceiveMessage()```](#3.12.9)进行最后的IPC消息处理。  
+
+>> 3.会被认为是来自Master系统默认IPC通讯消息类型为
+>> 
+```
+[
+  Core.macro.CLUSTER_MASTER_IPC_TYPE_GET_WORKER_INDEX_RESULT,
+  Core.macro.CLUSTER_MASTER_IPC_TYPE_SET_GLOBAL_OBJECT,
+  Core.macro.CLUSTER_MASTER_IPC_TYPE_SET_GLOBAL_OBJECT_RESULT,
+  Core.macro.CLUSTER_MASTER_IPC_TYPE_GET_GLOBAL_OBJECT_RESULT
+]
+```
+
+> **参数说明:**  
+ > **1. data\<Object/Number/Boolean/String\>**  
+> IPC通信从Master发来的数据，为**对象类型/数字/布尔/字符串**。  
+
+> **结果说明:**  
+> **1. nextData\<Object/Number/Boolean/String/Null\>**  
+> IPC通信继续向下传递的数据，为**对象类型/数字/布尔/字符串/Null**。
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  onWorkerProcessWillReceiveMessage(data) {
+    if (data.type === 'MASTER:WILL_DISCARD_MSG') {
+      return null;
+    } else {
+      return data;
+    }
+  }
+}
+```
+
+<a id="3.12.9"></a>
+#### 3.12.9 AppMain.onWorkerProcessDidReceiveMessage(data)
+> **API说明:**  
+> ```onWorkerProcessDidReceiveMessage()```是Worker进程处理被捕获的IPC消息最后的HOOK函数，可以在其中进行异步操作。**<font color="red">其中代码将会运行在Worker进程，不推荐在此方法中调用[```AppMain.processIndex```](#3.12.1)</font>**。  
+
+> **参数说明:**   
+> **1. data\<Object/Number/Boolean/String\>**  
+> IPC通信从Master发来的数据，为**对象类型/数字/布尔/字符串**。<font color="red">此值为[```AppMain.onWorkerProcessWillReceiveMessage()```](#3.12.8)的返回值</font>。  
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  onWorkerProcessDidReceiveMessage(data) {
+    console.log(`Worker Did Receive : ${JSON.stringify(data)}`);
+  }
+}
+```
+
+<a id="3.12.10"></a>
+#### 3.12.10 AppMain.onWorkerProcessDiscardMessage(data)
+> **API说明:**  
+> ```onWorkerProcessDiscardMessage()```是Worker进程处理被舍弃的IPC消息最后的HOOK函数，可以在其中进行异步操作。**<font color="red">其中代码将会运行在Worker进程，不推荐在此方法中调用[```AppMain.processIndex```](#3.12.1)</font>**。  
+
+> **参数说明:**  
+> **1. data\<Object/Number/Boolean/String\>**  
+> IPC通信从Master发来的数据，为**对象类型/数字/布尔/字符串**。<font color="red">此值为[```AppMain.onWorkerProcessWillReceiveMessage()```](#3.12.8)传入的data</font>。  
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  onWorkerProcessDiscardMessage(data) {
+    console.log(`Worker Discard : ${JSON.stringify(data)}`);
+  }
+}
+```
+
+<a id="3.12.11"></a>
+#### 3.12.11 AppMain.onWorkerProcessDidReceiveCustomMessage(data)
+> **API说明:**  
+> ```onWorkerProcessDidReceiveCustomMessage()```是Worker进程处理被捕获的非系统默认IPC消息的HOOK函数，不推荐在其中进行异步操作。**<font color="red">其中代码将会运行在Worker进程，不推荐在此方法中调用[```AppMain.processIndex```](#3.12.1)，此函数执行结束后将会调用[```AppMain.onWorkerProcessDidReceiveMessage()```](#3.12.9)</font>**。  
+
+> **参数说明:**  
+> **1. data\<Object/Number/Boolean/String\>**  
+> IPC通信从Master发来的数据，为**对象类型/数字/布尔/字符串**。<font color="red">此值为[```AppMain.onWorkerProcessWillReceiveMessage()```](#3.12.8)的返回值</font>。  
+
+> **样例代码:**
+> 
+```
+let Core = require('Core.js');
+// 实现AppMain
+class AppMain extends Core.appMain {
+  onWorkerProcessDidReceiveCustomMessage(data) {
+    console.log(`Worker Did Receive Custom : ${JSON.stringify(data)}`);
+  }
+}
+```
 
 <a id="3.13"></a>
 ### 3.13 Core.checker
@@ -3783,10 +4197,8 @@ Core.checker.checkWithParamModel(paramModel, '11111111', (result, errInfo) => {
 > **参数列表:**  
 > **1. originMsg\<Buffer/String\>**  
 > 要加密的明文数据，**必传项**，为**缓冲区类型/字符串**。  
-
 > **2. key\<String\>**  
 > AES密钥，**必传项**，为**字符串**。  
-
 > **3. opt\<Object\>**  
 > AES加密选项，**非必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
@@ -3816,10 +4228,8 @@ let result = Core.crypto.aesEncrypt(originMsg, aesKey, aesOpt);
 > **参数列表:**  
 > **1. cryptedMsg\<Buffer/String\>**  
 > 要解密的密文数据，**必传项**，为**缓冲区类型/字符串**。  
-
 > **2. key\<String\>**  
 > AES密钥，**必传项**，为**字符串**。  
-
 > **3. opt\<Object\>**  
 > AES解密选项，**非必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
@@ -3849,10 +4259,8 @@ let result = Core.crypto.aesDecrypt(decryptedMsg, aesKey, aesOpt);
 > **参数列表:**  
 > **1. originMsg\<String\>**  
 > 要加密的明文数据，**必传项**，为**字符串**。  
-
 > **2. publicKey\<Buffer/String\>**  
 > RSA公钥，**必传项**，为**缓冲区类型/字符串**。  
-
 > **3. opt\<Object\>**  
 > RSA加密选项，**非必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
@@ -3892,10 +4300,8 @@ let result = Core.crypto.rsaPublicEncrypt(originMsg, publicKey, rsaOpt);
 > **参数列表:**  
 > **1. cryptedMsg\<Buffer/String\>**  
 > 要解密的密文数据，**必传项**，为**缓冲区类型/字符串**。  
-
 > **2. privateKey\<Buffer/String\>**  
 > RSA私钥，**必传项**，为**缓冲区类型/字符串**。  
-
 > **3. opt\<Object\>**  
 > RSA解密选项，**非必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
@@ -3945,10 +4351,8 @@ let result = Core.crypto.rsaPrivateDecrypt(decryptedMsg, privateKey, rsaOpt);
 > **参数列表:**  
 > **1. originMsg\<String\>**  
 > 要加密的明文数据，**必传项**，为**字符串**。  
-
 > **2. privateKey\<Buffer/String\>**  
 > RSA私钥，**必传项**，为**缓冲区类型/字符串**。  
-
 > **3. opt\<Object\>**  
 > RSA加密选项，**非必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
@@ -3998,10 +4402,8 @@ let result = Core.crypto.rsaPrivateEncrypt(originMsg, privateKey, rsaOpt);
 > **参数列表:**  
 > **1. cryptedMsg\<Buffer/String\>**  
 > 要解密的密文数据，**必传项**，为**缓冲区类型/字符串**。  
-
 > **2. publicKey\<Buffer/String\>**  
 > RSA公钥，**必传项**，为**缓冲区类型/字符串**。  
-
 > **3. opt\<Object\>**  
 > RSA解密选项，**非必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
@@ -4041,10 +4443,8 @@ let result = Core.crypto.rsaPublicDecrypt(decryptedMsg, publicKey, rsaOpt);
 > **参数列表:**  
 > **1. originMsg\<String\>**  
 > 要签名的数据，**必传项**，为**缓冲区类型/字符串**。  
-
 > **2. privateKey\<Buffer/String\>**  
 > RSA私钥，**必传项**，为**缓冲区类型/字符串**。  
-
 > **3. opt\<Object\>**  
 > RSA签名选项，**非必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
@@ -4094,13 +4494,10 @@ let signature = Core.crypto.rsaPrivateSign(originMsg, privateKey, rsaOpt);
 > **参数列表:**  
 > **1. originMsg\<String\>**  
 > 要验签的数据，**必传项**，为**缓冲区类型/字符串**。  
-
 > **2. signature\<String\>**
 > 数字签名，**必传项**，为**字符串**。
-
 > **3. publicKey\<Buffer/String\>**  
 > RSA公钥，**必传项**，为**缓冲区类型/字符串**。  
-
 > **4. opt\<Object\>**  
 > RSA签名选项，**非必传项**，为**对象类型**，field格式为：**{选项名:选项细节}**。  
 >> 可配置选项名有：  
@@ -4141,7 +4538,6 @@ let result = Core.crypto.rsaPublicVerify(originMsg, signature, publicKey, rsaOpt
 > **参数列表:**  
 > **1. bit\<Integer\>**  
 > RSA密钥的位数，**必传项**，为**整型数字**。  
-
 > **2. keyType\<String\>**  
 > 密钥类型，**非必传项**，为**特定字符串**，默认值为**'pem'**，可选值为**['pem','der']**。
 
@@ -4168,7 +4564,6 @@ let rsaInfo = Core.crypto.getRsaKeyPair(1024, 'der');
 > **参数列表:**  
 > **1. originMsg\<String\>**  
 > 需要编码的明文，**必传项**，为**字符串**。  
-
 > **2. inputEncoding\<String\>**  
 > 明文输入的编码方式，**非必传项**，为**特定字符串**，默认值为**'utf-8'**，可选值为**['utf-8','ascii','latin1','hex']**。
 
@@ -4191,7 +4586,6 @@ let result = Core.crypto.base64Encode(originMsg);
 > **参数列表:**  
 > **1. cryptedMsg\<String\>**  
 > 需要解码的密文，**必传项**，为**字符串**。  
-
 > **2. outputEncoding\<String\>**  
 > 解码结果的编码方式，**非必传项**，为**特定字符串**，默认值为**'utf-8'**，可选值为**['utf-8','ascii','latin1','hex']**。
 
@@ -4214,7 +4608,6 @@ let result = Core.crypto.base64Decode(cryptedMsg);
 > **参数列表:**  
 > **1. length\<Integer\>**  
 > 随机字符串的长度，**必传项**，为**整型数字**。  
-
 > **2. type\<String\>**  
 > 随机字符串的类型，**非必传项**，为**字符串**，默认值为**'u+l+n+s'**。**<font color="red">'u'表示大写字母，'l'表示小写字母，'n'表示数字，'s'表示符号；若使用其中的一种或几种，中间使用'+'连接即可</font>**。
 
@@ -4260,7 +4653,6 @@ let result = Core.crypto.getRandomInteger('[1,2)');
 > **参数列表:**  
 > **1. date\<Date\>**  
 > 需要解析的时间，**必传项**，为**日期类型**。
-
 > **2. fmt\<String\>**  
 > 解析格式的字符串，**非必传项**，为**字符串**，默认值为**yyyy-MM-dd HH:mm:ss.S**。**<font color="red">其中y表示年份，M表示月份，d表示天，q表示季度，E表示星期，H表示24小时制下的小时，h表示12小时制下的小时，m表示分钟，s表示秒，S表示毫秒</font>**。  
 
@@ -4278,8 +4670,6 @@ let result = Core.time.format(new Date(),'yyyy-MM-dd HH:mm:ss.S EEE q');
 #### 3.15.2 Core.time.getCurrentTimeString()
 > **API说明:**  
 > ```getCurrentTimeString()```用来获取当前的时间描述字符串。
-
-> **参数列表:**  
 
 > **结果说明:**  
 > **1. timeString\<String\>**  
@@ -4299,7 +4689,6 @@ let result = Core.time.getCurrentTimeString();
 > **参数列表:**  
 > **1. startDate\<Date\>**  
 > 起始时间，**必传项**，为**日期类型**。
-
 > **2. endDate\<Date\>**  
 > 结束时间，**必传项**，为**日期类型**。
 
@@ -4320,8 +4709,6 @@ let interval = Core.time.getTimeInterval(startDate, endDate);
 #### 3.15.4 Core.time.getTimestamp()
 > **API说明:**  
 > ```getTimestamp()```用来获取当前的时间戳。
-
-> **参数列表:**  
 
 > **结果说明:**  
 > **1. timestamp\<Integer\>**  
@@ -4395,7 +4782,6 @@ let type = Core.utils.getType(()=>{});
 > **参数列表:**  
 > **1. obj\<Object\>**  
 > 需要排序的对象，**必传项**，为**对象类型**。
-
 > **2. type\<String\>**  
 > 排序方式，**非必传项**，为**特定字符串**，默认值为**'asc'**，可选值为**['asc','desc']**。其中asc表示升序，desc表示降序。
 
@@ -4436,7 +4822,6 @@ let result = Core.utils.mapSort(obj, 'desc');
 > **参数列表:**  
 > **1. obj\<Object\>**  
 > 需要排序的对象，**必传项**，为**对象类型**。
-
 > **2. type\<String\>**  
 > 排序方式，**非必传项**，为**特定字符串**，默认值为**'asc'**，可选值为**['asc','desc']**。其中asc表示升序，desc表示降序。
 
